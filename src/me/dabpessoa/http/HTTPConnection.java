@@ -15,11 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 public class HTTPConnection {
-
-	public static enum REQUEST_METHODS {
-		GET,
-		POST;
-	}
 	
 	private String url;
 	private String method;
