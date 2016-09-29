@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.URL;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -47,8 +48,16 @@ public class HTTPConnection {
 		} else url = path;
 	}
 	
+	public void addParam(String name, String value) {
+		if (getUrlParams() == null) {
+			setUrlParams(new HashMap<String,String>());
+		}
+		getUrlParams().put(name, value);
+	}
+	
 	public String request() throws IOException {
 		
+		prepareConnection();
 		connect();
 		
 		if (connection.getResponseCode() != 200) {
@@ -70,7 +79,19 @@ public class HTTPConnection {
 		
 	}
 	
-	public void prepareConnection() throws MalformedURLException, IOException {
+	public Proxy createHTTPProxy(String proxyHost, Integer proxyPort) {
+		return new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort));
+	}
+	
+	public void setChunkedStreamingMode(int chunklen) {
+		if (connection != null) connection.setChunkedStreamingMode(chunklen);
+	}
+	
+	public void setDoOutput(boolean value) {
+		if (connection != null) connection.setDoOutput(value);
+	}
+	
+	private void prepareConnection() throws MalformedURLException, IOException {
 		if (connection == null) {
 			
 			url = verifyURL(url);
@@ -95,30 +116,24 @@ public class HTTPConnection {
 					connection.setRequestProperty(entry.getKey(), valueBuffer.toString());
 				}
 			}
+			
+			if (getMethod() != null && method.equalsIgnoreCase(HTTPMethods.POST.name())) {
+				connection.setChunkedStreamingMode(0);
+				connection.setDoOutput(true);
+			}
+			
 		}
 	}
-	
-	public void setChunkedStreamingMode(int chunklen) {
-		if (connection != null) connection.setChunkedStreamingMode(chunklen);
-	}
-	
-	public void setDoOutput(boolean value) {
-		if (connection != null) connection.setDoOutput(value);
-	}
-	
-	public Proxy createHTTPProxy(String proxyHost, Integer proxyPort) {
-		return new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort));
-	}
 
-	public void connect() throws IOException {
+	private void connect() throws IOException {
 		if (connection != null) connection.connect();
 	}
 	
-	public void disconnect() {
+	private void disconnect() {
 		if (connection != null) connection.disconnect();
 	}
 	
-	public String verifyURL(String url) {
+	private String verifyURL(String url) {
 		StringBuffer newURL = new StringBuffer(url);
 		if (newURL.indexOf("?") == -1) {
 			newURL.append("?");
