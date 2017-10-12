@@ -1,14 +1,15 @@
 package me.dabpessoa.http;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import org.omg.CORBA.portable.ApplicationException;
+
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -16,25 +17,29 @@ import java.util.List;
 import java.util.Map;
 
 public class HTTPConnection {
-	
+
+	public static final Charset DEFULT_CHARSET = StandardCharsets.UTF_8;
+
 	private String url;
 	private String method;
+	private Charset charset;
 	private Map<String, List<String>> headers;
 	private Map<String, String> urlParams;
 	private ProxyCredentials proxyCredentials;
 	private HttpURLConnection connection;
 	
 	public HTTPConnection(String url, String method) {
-		this.url = url;
-		this.method = method;
+		this(url, method, null, null);
 	}
 	
 	public HTTPConnection(String url, String method, ProxyCredentials proxyCredentials) {
-		this.url = url;
-		this.method = method;
-		this.proxyCredentials = proxyCredentials;
+		this(url, method, proxyCredentials, null);
 	}
-	
+
+	public HTTPConnection(String url, String method, Map<String, List<String>> headers) {
+		this(url, method, null, headers);
+	}
+
 	public HTTPConnection(String url, String method, ProxyCredentials proxyCredentials, Map<String, List<String>> headers) {
 		this.url = url;
 		this.method = method;
@@ -54,10 +59,14 @@ public class HTTPConnection {
 		}
 		getUrlParams().put(name, value);
 	}
-	
+
 	public String request() throws IOException {
+		return request(null);
+	}
+
+	public String request(byte[] bytesAppendToBody) throws IOException {
 		
-		prepareConnection();
+		prepareConnection(bytesAppendToBody);
 		connect();
 		
 		if (connection.getResponseCode() != 200) {
@@ -86,12 +95,24 @@ public class HTTPConnection {
 	public void setChunkedStreamingMode(int chunklen) {
 		if (connection != null) connection.setChunkedStreamingMode(chunklen);
 	}
+
+	public void setDoInput(boolean doInput) {
+		if (connection != null) connection.setDoInput(doInput);
+	}
+
+	public void setUseCaches(boolean useCaches) {
+		if (connection != null) connection.setUseCaches(useCaches);
+	}
 	
 	public void setDoOutput(boolean value) {
 		if (connection != null) connection.setDoOutput(value);
 	}
-	
-	private void prepareConnection() throws MalformedURLException, IOException {
+
+	private void prepareConnection() throws IOException {
+		prepareConnection(null);
+	}
+
+	private void prepareConnection(byte[] bytesAppendToBody) throws MalformedURLException, IOException {
 		if (connection == null) {
 			
 			url = verifyURL(url);
@@ -120,6 +141,10 @@ public class HTTPConnection {
 			if (getMethod() != null && method.equalsIgnoreCase(HTTPMethods.POST.name())) {
 				connection.setChunkedStreamingMode(0);
 				connection.setDoOutput(true);
+			}
+
+			if (bytesAppendToBody != null && bytesAppendToBody.length != 0) {
+				writeToRequestBody(bytesAppendToBody);
 			}
 			
 		}
@@ -153,6 +178,31 @@ public class HTTPConnection {
 		}
 		
 		return newURL.toString();
+	}
+
+	public void writeToRequestBody(String body) {
+		writeToRequestBody(body, null);
+	}
+
+	public void writeToRequestBody(String body, Charset charset) {
+		if (charset == null) {
+			charset = getCharset() == null ? DEFULT_CHARSET : getCharset();
+		}
+		writeToRequestBody(body.getBytes(charset));
+	}
+
+	public void writeToRequestBody(byte[] bytes) {
+		if (connection != null) {
+			try {
+				try( DataOutputStream wr = new DataOutputStream( connection.getOutputStream())) {
+                    wr.write( bytes );
+					wr.flush();
+                }
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Erro ao escrever dados no corpo da requisição. Bytes -> "+bytes);
+			}
+		}
 	}
 	
 	public String getUrl() {
@@ -202,5 +252,13 @@ public class HTTPConnection {
 	public void setConnection(HttpURLConnection connection) {
 		this.connection = connection;
 	}
-	
+
+	public Charset getCharset() {
+		return charset;
+	}
+
+	public void setCharset(Charset charset) {
+		this.charset = charset;
+	}
+
 }
