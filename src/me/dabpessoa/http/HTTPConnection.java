@@ -61,12 +61,8 @@ public class HTTPConnection {
 	}
 
 	public String request() throws IOException {
-		return request(null);
-	}
-
-	public String request(byte[] bytesAppendToBody) throws IOException {
 		
-		prepareConnection(bytesAppendToBody);
+		prepareConnection();
 		connect();
 		
 		if (connection.getResponseCode() != 200) {
@@ -96,6 +92,10 @@ public class HTTPConnection {
 		if (connection != null) connection.setChunkedStreamingMode(chunklen);
 	}
 
+	public void setFixedLengthStreamingMode(int value) {
+		if (connection != null) connection.setFixedLengthStreamingMode(value);
+	}
+
 	public void setFixedLengthStreamingMode(long value) {
 		if (connection != null) connection.setFixedLengthStreamingMode(value);
 	}
@@ -113,12 +113,8 @@ public class HTTPConnection {
 	}
 
 	public void prepareConnection() throws IOException {
-		prepareConnection(null);
-	}
-
-	public void prepareConnection(byte[] bytesAppendToBody) throws MalformedURLException, IOException {
 		if (connection == null) {
-			
+
 			url = verifyURL(url);
 			
 			connection = (HttpURLConnection) new URL(url).openConnection(proxyCredentials != null ? createHTTPProxy(proxyCredentials.getHost(), proxyCredentials.getPort()) : Proxy.NO_PROXY);
@@ -143,12 +139,7 @@ public class HTTPConnection {
 			}
 			
 			if (getMethod() != null && method.equalsIgnoreCase(HTTPMethods.POST.name())) {
-				connection.setChunkedStreamingMode(0);
 				connection.setDoOutput(true);
-			}
-
-			if (bytesAppendToBody != null && bytesAppendToBody.length != 0) {
-				writeToRequestBody(bytesAppendToBody);
 			}
 			
 		}
