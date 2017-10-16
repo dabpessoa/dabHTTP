@@ -97,7 +97,7 @@ public class HTTPConnection {
 	}
 
 	public void setFixedLengthStreamingMode(long value) {
-		connection.setFixedLengthStreamingMode(value);
+		if (connection != null) connection.setFixedLengthStreamingMode(value);
 	}
 
 	public void setDoInput(boolean doInput) {
@@ -112,11 +112,11 @@ public class HTTPConnection {
 		if (connection != null) connection.setDoOutput(value);
 	}
 
-	private void prepareConnection() throws IOException {
+	public void prepareConnection() throws IOException {
 		prepareConnection(null);
 	}
 
-	private void prepareConnection(byte[] bytesAppendToBody) throws MalformedURLException, IOException {
+	public void prepareConnection(byte[] bytesAppendToBody) throws MalformedURLException, IOException {
 		if (connection == null) {
 			
 			url = verifyURL(url);
