@@ -96,6 +96,10 @@ public class HTTPConnection {
 		if (connection != null) connection.setChunkedStreamingMode(chunklen);
 	}
 
+	public void setFixedLengthStreamingMode(long value) {
+		connection.setFixedLengthStreamingMode(value);
+	}
+
 	public void setDoInput(boolean doInput) {
 		if (connection != null) connection.setDoInput(doInput);
 	}
