@@ -82,7 +82,7 @@ public class Main {
 		Map<String, List<String>> headers = new HashMap<String, List<String>>();
 		headers.put("Content-Type", Arrays.asList("application/json; charset=utf-8"));
 		headers.put("Accept", Arrays.asList(AcceptOption.JSON.getMimeTypeString()));
-		headers.put("Accept-Charset", Arrays.asList("utf-8"));
+		headers.put("Accept-Charset", Arrays.asList("UTF-8"));
 		headers.put("Content-Length", Arrays.asList(Integer.toString(jsonRequestBuilder.toString().length())));
 
 		// TOKEN
