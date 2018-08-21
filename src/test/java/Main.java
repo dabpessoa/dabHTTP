@@ -2,7 +2,6 @@ import me.dabpessoa.http.AcceptOption;
 import me.dabpessoa.http.HTTPConnection;
 import me.dabpessoa.http.HTTPMethods;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -64,11 +63,11 @@ public class Main {
 
 
 //		String url = "http://localhost:8080/boletoglobal/api/teste/something";
-		String url = "http://localhost:8080/boletoglobal/api/titulo/add";
+		/*String url = "http://localhost:8080/boletoglobal/api/titulo/add";
 		String requestMethod = HTTPMethods.PUT.name();
 
 		StringBuilder jsonRequestBuilder = new StringBuilder();
-		jsonRequestBuilder.append("{\"nome\":\"diego\",\"numero\":\"10\"}");
+		jsonRequestBuilder.append("{\"nome\":\"diego\",\"numero\":\"10\"}");*/
 //		jsonRequestBuilder.append("{ ");
 //		jsonRequestBuilder.append("	\"test\":false, ");
 //		jsonRequestBuilder.append("	\"language\":\"en\", ");
@@ -79,7 +78,7 @@ public class Main {
 //		jsonRequestBuilder.append("	} ");
 //		jsonRequestBuilder.append("} ");
 
-		Map<String, List<String>> headers = new HashMap<String, List<String>>();
+		/*Map<String, List<String>> headers = new HashMap<String, List<String>>();
 		headers.put("Content-Type", Arrays.asList("application/json; charset=utf-8"));
 		headers.put("Accept", Arrays.asList(AcceptOption.JSON.getMimeTypeString()));
 		headers.put("Accept-Charset", Arrays.asList("UTF-8"));
@@ -99,8 +98,49 @@ public class Main {
 			e.printStackTrace();
 		}
 
-		System.out.println(response);
+		System.out.println(response);*/
 
+		testeCielo();
+
+	}
+
+	public static void testeCielo() {
+
+		String url = "http://localhost:8080/cieloapi/pay/cartao";
+		String requestMethod = HTTPMethods.POST.name();
+
+		StringBuilder jsonRequestBuilder = new StringBuilder();
+		jsonRequestBuilder.append("{");
+		jsonRequestBuilder.append("\"environment\":\"producao\",");
+		jsonRequestBuilder.append("	\"merchantOrderId\":\"991\",");
+		jsonRequestBuilder.append("	\"expirationDate\":\"05/2023\",");
+		jsonRequestBuilder.append("	\"cardNumber\":\"****\",");
+		jsonRequestBuilder.append("	\"securityCode\":\"***\",");
+		jsonRequestBuilder.append("	\"brand\":\"visa\",");
+		jsonRequestBuilder.append("	\"holder\":\"diego\",");
+		jsonRequestBuilder.append("	\"client\":\"eu sou o cliente\",");
+		jsonRequestBuilder.append("	\"amount\":\"1\",");
+		jsonRequestBuilder.append("	\"tipo\":\"2\"");
+		jsonRequestBuilder.append("}");
+
+		Map<String, List<String>> headers = new HashMap<String, List<String>>();
+		headers.put("Content-Type", Arrays.asList("application/json; charset=utf-8"));
+		headers.put("Accept", Arrays.asList(AcceptOption.JSON.getMimeTypeString()));
+		headers.put("Accept-Charset", Arrays.asList("UTF-8"));
+		headers.put("Content-Length", Arrays.asList(Integer.toString(jsonRequestBuilder.toString().length())));
+
+		HTTPConnection connection = new HTTPConnection(url, requestMethod, headers);
+
+		String response = null;
+		try {
+			connection.prepareConnection();
+			connection.writeToRequestBody(jsonRequestBuilder.toString().getBytes(StandardCharsets.UTF_8));
+			response = connection.request();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		System.out.println(response);
 
 	}
 	
