@@ -112,12 +112,12 @@ public class Main {
 		StringBuilder jsonRequestBuilder = new StringBuilder();
 		jsonRequestBuilder.append("{");
 		jsonRequestBuilder.append("\"environment\":\"producao\",");
-		jsonRequestBuilder.append("	\"merchantOrderId\":\"991\",");
-		jsonRequestBuilder.append("	\"expirationDate\":\"05/2023\",");
+		jsonRequestBuilder.append("	\"merchantOrderId\":\"1919\",");
+		jsonRequestBuilder.append("	\"expirationDate\":\"**/***\",");
 		jsonRequestBuilder.append("	\"cardNumber\":\"****\",");
 		jsonRequestBuilder.append("	\"securityCode\":\"***\",");
-		jsonRequestBuilder.append("	\"brand\":\"visa\",");
-		jsonRequestBuilder.append("	\"holder\":\"diego\",");
+		jsonRequestBuilder.append("	\"brand\":\"master\",");
+		jsonRequestBuilder.append("	\"holder\":\"DIEGO A B PESSOA\",");
 		jsonRequestBuilder.append("	\"client\":\"eu sou o cliente\",");
 		jsonRequestBuilder.append("	\"amount\":\"1\",");
 		jsonRequestBuilder.append("	\"tipo\":\"2\"");
